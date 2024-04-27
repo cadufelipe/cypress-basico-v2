@@ -22,4 +22,23 @@
 //
 //
 // -- This will overwrite an existing command --
+//<<<<<<< HEAD
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+//>>>>>>> a2dfeafc0bc3d8a8a5d03536f5ce903da5fe1353
+Cypress.Commands.add('generateFixture',() => {
+    const faker = require('faker')
+
+    cy.writeFile('cypress/fixtures/stories.json', {
+        'hits' : Cypress._.times(20, () => {
+            return{
+                'title': `${faker.lorem.words(3)}`,
+                'url': `${faker.internet.url()}`,
+                'author': `${faker.name.fistName}`,
+                'num_comments': `${faker.datatype.number()}`,
+                'point': `${faker.datatype.number()}`,
+                'objectID': `${faker.datatype.uuid()}`,
+            }
+        })
+    })
+})
