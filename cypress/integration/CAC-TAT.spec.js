@@ -11,7 +11,6 @@ describe('Central de Atendimento ao Cliente TAT', function() {
 
     it('preenche os campos obrigatórios e envia o formulário', function(){
         const longText = ' Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande Texto exemplo gigante grande'
-
         cy.get('#firstName').type('Carlos Felipe')
         cy.get('#lastName').type('Silva de Oliveira')
         cy.get('#email').type('felipecarloscontato@gmail.com')
@@ -39,7 +38,7 @@ describe('Central de Atendimento ao Cliente TAT', function() {
         cy.get('#firstName').type('Carlos Felipe')
         cy.get('#lastName').type('Silva de Oliveira')
         cy.get('#email').type('felipecarloscontatogmail.com')
-        cy.get('#phone-checkbox').click()
+        cy.get('#phone-checkbox').check()
         cy.get('#open-text-area').type('text')
         cy.get('button[type="submit"]').click()     
 
@@ -97,19 +96,66 @@ describe('Central de Atendimento ao Cliente TAT', function() {
         .should('have.value','blog')
     })
 
-    it.only('marca o tipo de atendimento "Feedback"',function(){
+    it('marca o tipo de atendimento "Feedback"',function(){
         cy.get('input[type="radio"][value="feedback"]')
           .check()
           .should('have.value','feedback')
 
     })
 
-    it.only('marca cada tipo de atendimento', function(){
+    it('marca cada tipo de atendimento', function(){
         cy.get('input[type="radio"]')
           .should('have.length', 3)
           .each(function($radio) {
             cy.wrap($radio).check()
             cy.wrap($radio).should('be.checked')
           })
+    })
+
+    it('marca ambos checkboxes, depois desmarca o último', function(){
+        cy.get('input[type="checkbox"]')
+          .check()
+          .should('be.checked')
+          .last()
+          .uncheck()
+          .should('not.be.checked')
+    })
+
+    it('seleciona um arquivo da pasta fixtures', function(){
+        cy.get('input[type="file"]')
+          .should('not.have.value')
+          .selectFile('./cypress/fixtures/example.json')
+          .should(function($input) {
+            expect($input[0].files[0].name).to.equal('example.json')
+          })
+    })
+    
+    it('seleciona um arquivo simulando um drag-and-drop', function(){
+        cy.get('input[type="file"]')
+          .should('not.have.value')
+          .selectFile('./cypress/fixtures/example.json',{action : 'drag-drop'})
+          .should(function($input) {
+            expect($input[0].files[0].name).to.equal('example.json')
+          })
+    })
+
+    it('seleciona um arquivo utilizando uma fixture para a qual foi dada um alias', function(){
+        cy.fixture('example').as('samplefile')
+        cy.get('input[type="file"]')
+          .selectFile('@samplefile')
+          .should(function($input) {
+            expect($input[0].files[0].name).to.equal('example')
+          })
+    })
+
+    it('verifica que a política de privacidade abre em outra aba sem a necessidade de um clique', function(){
+        cy.get('#privacy a').should('have.attr','target', '_blank')
+    })
+
+    it.only('testa a página da política de privacidade de forma independente', function(){
+        cy.get('#privacy a')
+          .invoke('removeAttr', 'target')
+          .click()
+        cy.contains('Talking About Testing').should('be.visible')
     })
 })
